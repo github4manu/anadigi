@@ -10,10 +10,14 @@
   // Constructor - creates a Flasher
   // and initializes the member variables and state
 
-ledFlasherClass::ledFlasherClass(uint8_t pin, uint16_t on, uint16_t off, uint16_t longoff, uint8_t repeatof)
+ledFlasherClass::ledFlasherClass(uint8_t ledpin, uint16_t on, uint16_t off, uint16_t longoff, uint8_t repeatoff)
+  : _ledPin(ledpin), _OnTime(on), _OffTime(off), _LongOffTime(longoff), _repeatOnOff(repeatoff)
   {
-	_ledPin = pin;
+	//_ledPin = pin;
 	pinMode(_ledPin, OUTPUT);
+	_ledState = _LOW;
+	_previousMillis = 0;
+	_repeatOnOffCount = 1;
 /*
 	OnTime = on;
 	OffTime = off;
@@ -21,24 +25,20 @@ ledFlasherClass::ledFlasherClass(uint8_t pin, uint16_t on, uint16_t off, uint16_
 	ledState = LOW;
 	previousMillis = 0;
 */
-	setOnOffTime(on, off, longoff, repeatof);
+	//setOnOffTime(_OnTime, _OffTime, _LongOffTime, _repeatOnOff);
   }
-void ledFlasherClass::setOnOffTime(uint16_t on, uint16_t off, uint16_t longoff, uint8_t repeatof)
+void ledFlasherClass::setOnOffTime(uint16_t on, uint16_t off, uint16_t longoff, uint8_t repeatoff)
 {
 	_OnTime = on;
 	_OffTime = off;
 	_LongOffTime = longoff;
-	_repeatOnOff = repeatof;
-
-	_ledState = _LOW;
-	_previousMillis = 0;
-	_repeatOnOffCount = 1;
+	_repeatOnOff = repeatoff;
 }
 
 void ledFlasherClass::Update()
 {
   // check to see if it's time to change the state of the LED
-  unsigned long currentMillis = millis();
+  const unsigned long currentMillis = millis();
 
 	  if((_ledState == _HIGH) && (currentMillis - _previousMillis >= _OnTime))
 	  {

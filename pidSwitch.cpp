@@ -21,24 +21,24 @@ PIDSWITCHclass::PIDSWITCHclass()
 {
 	_potrawval = 0;
 	//switchchange = false;  // 1x trigger if switch has changed
-	switchrapidtoggle = false;  // state when switch is rapidely <400 ms toggled
-	switchrapidtogglecnt = 0;  // state when switch is rapidely <400 ms toggled
+	_switchrapidtoggle = false;  // state when switch is rapidely <400 ms toggled
+	_switchrapidtogglecnt = 0;  // state when switch is rapidely <400 ms toggled
 	pidpage[PREVIOUS] = 0; pidpage[CURRENT] = 1; //previous,current default page = 1, reset=0
-	swval[PREVIOUS] = 1500; swval[CURRENT] = 1500;    // current / previous variable to read the value from the analog pin
-	swpos[PREVIOUS] = posMID; swpos[CURRENT] = posLOW;    // current / previous variable to hold switch position
-	swdir[PREVIOUS] = dir0; swdir[CURRENT] = dir0;    // current / previous variable to hold switch direction
-	swpostime[PREVIOUS] = 0; swpostime[CURRENT] = 0; swpostime[DELTA] = 0; // current, previous, delta millisec since switch changed position 49 days and 17 hours....
+	_swval[PREVIOUS] = 1500; _swval[CURRENT] = 1500;    // current / previous variable to read the value from the analog pin
+	_swpos[PREVIOUS] = posMID; _swpos[CURRENT] = posLOW;    // current / previous variable to hold switch position
+	_swdir[PREVIOUS] = dir0; _swdir[CURRENT] = dir0;    // current / previous variable to hold switch direction
+	_swpostime[PREVIOUS] = 0; _swpostime[CURRENT] = 0; _swpostime[DELTA] = 0; // current, previous, delta millisec since switch changed position 49 days and 17 hours....
 	pid = X;
 
-	swpos[CURRENT] = posLOW;
-	swpos[PREVIOUS] = swpos[CURRENT];
+	_swpos[CURRENT] = posLOW;
+	_swpos[PREVIOUS] = _swpos[CURRENT];
 	switchchange = true;
-	swdir[CURRENT] = dir0;
-	swdir[PREVIOUS] = swdir[CURRENT];
-	swpostime[CURRENT] = millis();
-	swpostime[PREVIOUS] = swpostime[CURRENT];
-	swpostime[DELTA] = swpostime[CURRENT] - swpostime[PREVIOUS];
-	switchrapidtoggle = false;
+	_swdir[CURRENT] = dir0;
+	_swdir[PREVIOUS] = _swdir[CURRENT];
+	_swpostime[CURRENT] = millis();
+	_swpostime[PREVIOUS] = _swpostime[CURRENT];
+	_swpostime[DELTA] = _swpostime[CURRENT] - _swpostime[PREVIOUS];
+	_switchrapidtoggle = false;
 
 	check(_potrawval); //initialize
 
@@ -46,40 +46,40 @@ PIDSWITCHclass::PIDSWITCHclass()
 
 void PIDSWITCHclass::check(int16_t potrawval)
 {
-	swval[CURRENT] = map(potrawval,0,1023,1000,2000);
-	RxSwitchDiscreteValues(swval[CURRENT],swpos[CURRENT]);
-	if (swpos[CURRENT]!=swpos[PREVIOUS] && !switchchange)
+	_swval[CURRENT] = map(potrawval,0,1023,1000,2000);
+	RxSwitchDiscreteValues(_swval[CURRENT],_swpos[CURRENT]);
+	if (_swpos[CURRENT]!=_swpos[PREVIOUS] && !switchchange)
 	{
 		 switchchange = true;
-		 swpostime[CURRENT] = millis();
-		 swpostime[DELTA] = swpostime[CURRENT] - swpostime[PREVIOUS];
+		 _swpostime[CURRENT] = millis();
+		 _swpostime[DELTA] = _swpostime[CURRENT] - _swpostime[PREVIOUS];
 
-		 if (swpos[CURRENT] > swpos[PREVIOUS])
-		   { swdir[CURRENT] = dirUP;}
+		 if (_swpos[CURRENT] > _swpos[PREVIOUS])
+		   { _swdir[CURRENT] = dirUP;}
 		 else
-		   {swdir[CURRENT] = dirDOWN;}
+		   {_swdir[CURRENT] = dirDOWN;}
 
 		 //actions when delta > 400 milliseconds
 	//	 if (millis() - swpostime[PREVIOUS]<450) {
-		 if (swpostime[DELTA]<SWITCHDELAY)
+		 if (_swpostime[DELTA]<SWITCHDELAY)
 		 {
-			 switchrapidtoggle = true;
-			 switchrapidtogglecnt +=1;
-			 if ((swdir[CURRENT] == dirUP && swdir[PREVIOUS] == dirUP) || (swdir[CURRENT] == dirDOWN && swdir[PREVIOUS] == dirDOWN))
+			 _switchrapidtoggle = true;
+			 _switchrapidtogglecnt +=1;
+			 if ((_swdir[CURRENT] == dirUP && _swdir[PREVIOUS] == dirUP) || (_swdir[CURRENT] == dirDOWN && _swdir[PREVIOUS] == dirDOWN))
 			 {
 				 pidpage[CURRENT] +=1;
 			 }
-			 else if ((swdir[CURRENT] == dirUP && swdir[PREVIOUS] == dirDOWN) || (swdir[CURRENT] == dirDOWN && swdir[PREVIOUS] == dirUP))
+			 else if ((_swdir[CURRENT] == dirUP && _swdir[PREVIOUS] == dirDOWN) || (_swdir[CURRENT] == dirDOWN && _swdir[PREVIOUS] == dirUP))
 			 {
-				 if (switchrapidtogglecnt==1)
+				 if (_switchrapidtogglecnt==1)
 				 {
-					 if ((swpos[CURRENT] == posLOW && swpos[PREVIOUS] == posMID))
+					 if ((_swpos[CURRENT] == posLOW && _swpos[PREVIOUS] == posMID))
 					 {
 						 pid = P;
-					 } else if ((swpos[CURRENT] == posMID && swpos[PREVIOUS] == posLOW) || (swpos[CURRENT] == posMID && swpos[PREVIOUS] == posHIGH))
+					 } else if ((_swpos[CURRENT] == posMID && _swpos[PREVIOUS] == posLOW) || (_swpos[CURRENT] == posMID && _swpos[PREVIOUS] == posHIGH))
 					 {
 						 pid = I;
-					 } else if ((swpos[CURRENT] == posHIGH && swpos[PREVIOUS] == posMID))
+					 } else if ((_swpos[CURRENT] == posHIGH && _swpos[PREVIOUS] == posMID))
 					 {
 						 pid = D;
 					 }
@@ -88,9 +88,9 @@ void PIDSWITCHclass::check(int16_t potrawval)
 		 }
 		 else
 		 {
-			 switchrapidtoggle = false;
+			 _switchrapidtoggle = false;
 			 pid = X;
-			 switchrapidtogglecnt = 0;
+			 _switchrapidtogglecnt = 0;
 			 if (pidpage[CURRENT] > 0) pidpage[PREVIOUS]=pidpage[CURRENT];
 			 pidpage[CURRENT]=0;
 		 }
@@ -99,10 +99,10 @@ void PIDSWITCHclass::check(int16_t potrawval)
 	else
 	{
 		 switchchange = false;
-		 swdir[PREVIOUS] = swdir[CURRENT];
-		 swval[PREVIOUS] = swval[CURRENT];
-		 swpos[PREVIOUS] = swpos[CURRENT];
-		 swpostime[PREVIOUS] = swpostime[CURRENT];
+		 _swdir[PREVIOUS] = _swdir[CURRENT];
+		 _swval[PREVIOUS] = _swval[CURRENT];
+		 _swpos[PREVIOUS] = _swpos[CURRENT];
+		 _swpostime[PREVIOUS] = _swpostime[CURRENT];
 	}
 
 

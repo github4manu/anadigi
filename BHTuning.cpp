@@ -25,57 +25,21 @@
  */
 
 #include "BHTuning.h"
-#include "config.h"
-#include "def.h"
-#include "types.h"
-#include "MultiWii.h"
-//#include "EEPROM.h"
+
 
 //multiwii variables
 conf_t conf;
-int16_t rcData[RC_CHANS];    // interval [1000;2000]
+//int16_t rcData[RC_CHANS];    // interval [1000;2000]
 
 
 
-#ifdef BH_TUNE
-
-   enum bhTune_params {P, I, D};
-
-   // ****************************************************************
-   // ***************** START OF CONFIGURABLE PARAMS *****************
-
-   // PID loop to tune - ROLL, PITCH, YAW, PIDALT, PIDPOS, PIDPOSR, PIDNAVR, PIDLEVEL or PIDMAG
-   uint8_t bhTune_iKey = PITCH;
-
-   // PID parameter to tune - P, I or D
-   uint8_t bhTune_iParam = P;
-
-   // parameter value range - see maximums above
-   float bhTune_iValRange[2] = {2, 4};
-
-   // RC ch. of TX potentiometer input (e.g. AUX1)
-   const uint8_t bhTune_iInputCh = AUX1;
-
-   // lock pitch & roll values
-   const uint8_t bhTune_bLockPitchRoll = 0;
-
-   // ****************** END OF CONFIGURABLE PARAMS ******************
-   // ****************************************************************
-
-   // check if setting exists
-   const uint8_t bhTune_bSettingInvalid =
-      (bhTune_iKey > PIDMAG) ||
-      (bhTune_iParam > D) ||
-      (bhTune_iKey == PIDPOS && bhTune_iParam == D) ||
-      (bhTune_iKey == PIDMAG && bhTune_iParam != P)
-      ? 1 : 0;
-
-   uint8_t bhTune_bSaved = 0;
-   uint8_t bhTune_iParamRangeDelta;
-   uint8_t bhTune_iParamRangeMin;
+//#ifdef BH_TUNE
+BHTUNINGclass::BHTUNINGclass() {
+	;
+}
 
    // SETUP
-   void bhTune_setup() {
+   void BHTUNINGclass::bhTune_setup() {
       if (!bhTune_bSettingInvalid) {
          bhTune_iParamRangeMin = bhTune_clampUserVal(bhTune_iValRange[0]);
          bhTune_iParamRangeDelta = bhTune_clampUserVal(bhTune_iValRange[1]) - bhTune_iParamRangeMin;
@@ -83,7 +47,7 @@ int16_t rcData[RC_CHANS];    // interval [1000;2000]
    }
 
    // LOOP
-   uint8_t bhTune_loopSlow(int16_t rcDataAuxInput) {
+   uint8_t BHTUNINGclass::bhTune_loopSlow(int16_t rcDataAuxInput) {
       static uint8_t iParamVal;
       static uint8_t iParamValOld;
       if (!bhTune_bSettingInvalid) {
@@ -112,7 +76,7 @@ int16_t rcData[RC_CHANS];    // interval [1000;2000]
    }
 
    // APPLY MULTIPLIER, LIMIT
-   uint8_t bhTune_clampUserVal(float fParamVal) {
+   uint8_t BHTUNINGclass::bhTune_clampUserVal(float fParamVal) {
 
       // max vals (multipliers applied)
       uint8_t aPMax[] = {200, 200, 200, 200, 250, 250, 250, 200, 200};
@@ -141,7 +105,7 @@ int16_t rcData[RC_CHANS];    // interval [1000;2000]
    }
 
    // SAVE
-   void bhTune_save() {
+   void BHTUNINGclass::bhTune_save() {
 //     if (!f.ARMED && !bhTune_bSettingInvalid && !bhTune_bSaved) {
      if (!bhTune_bSettingInvalid && !bhTune_bSaved) {
          bhTune_bSaved = 1;
@@ -150,7 +114,7 @@ int16_t rcData[RC_CHANS];    // interval [1000;2000]
    }
 
    // UPDATE PARAM
-   void bhTune_setConfVal(uint8_t iParamVal, uint8_t iTuneKey) {
+   void BHTUNINGclass::bhTune_setConfVal(uint8_t iParamVal, uint8_t iTuneKey) {
       switch (bhTune_iParam) {
       case P:
          conf.pid[iTuneKey].P8 = iParamVal;
@@ -164,7 +128,7 @@ int16_t rcData[RC_CHANS];    // interval [1000;2000]
       }
    }
 
-#endif
+//#endif
 
 /*
 MULTIPLIERS

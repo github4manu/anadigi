@@ -1230,10 +1230,10 @@ Also note, that maqgnetic declination changes with time, so recheck your value e
 // enable/disable
 #define BH_TUNE
 // uncomment any hooks you're using in UserCode.ino
-#define USER_SETUP userSetup();
+//#define USER_SETUP userSetup();
 //#define USER_LOOP_FAST userLoopFast();
-#define USER_LOOP_SLOW rcRawDataAuxOutput = userLoopSlow(rcRawDataAuxInput);
-#define USER_LOOP_1HZ userLoop1Hz();
+//#define USER_LOOP_SLOW rcRawDataAuxOutput = userLoopSlow(rcRawDataAuxInput);
+//#define USER_LOOP_1HZ userLoop1Hz();
 
 /*************************************************************************************************/
 /****           END OF CONFIGURABLE PARAMETERS                                                ****/
