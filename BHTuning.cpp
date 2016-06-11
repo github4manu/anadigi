@@ -34,15 +34,30 @@ conf_t conf;
 
 
 //#ifdef BH_TUNE
-BHTUNINGclass::BHTUNINGclass() {
-	;
-}
+	BHTUNINGclass::BHTUNINGclass() {
+		_bhTune_iKey = PITCH;
+		_bhTune_iParam = P;
+		_bhTune_iValRange[0] = 2;
+		_bhTune_iValRange[1] = 4;
+		_bhTune_iInputCh = AUX1;
+		_bhTune_bLockPitchRoll = 0;
+	}
+
+	uint8_t BHTUNINGclass::bhTune_CheckSettingIsValid() {
+		return
+			(_bhTune_iKey > PIDMAG) ||
+			(_bhTune_iParam > D) ||
+			(_bhTune_iKey == PIDPOS && _bhTune_iParam == D) ||
+			(_bhTune_iKey == PIDMAG && _bhTune_iParam != P)
+			? false : true;
+	}
+
 
    // SETUP
    void BHTUNINGclass::bhTune_setup() {
-      if (!bhTune_bSettingInvalid) {
-         bhTune_iParamRangeMin = bhTune_clampUserVal(bhTune_iValRange[0]);
-         bhTune_iParamRangeDelta = bhTune_clampUserVal(bhTune_iValRange[1]) - bhTune_iParamRangeMin;
+      if (bhTune_CheckSettingIsValid()) {
+         _bhTune_iParamRangeMin = bhTune_clampUserVal(_bhTune_iValRange[0]);
+         _bhTune_iParamRangeDelta = bhTune_clampUserVal(_bhTune_iValRange[1]) - _bhTune_iParamRangeMin;
       }
    }
 
@@ -50,25 +65,25 @@ BHTUNINGclass::BHTUNINGclass() {
    uint8_t BHTUNINGclass::bhTune_loopSlow(int16_t rcDataAuxInput) {
       static uint8_t iParamVal;
       static uint8_t iParamValOld;
-      if (!bhTune_bSettingInvalid) {
+      if (bhTune_CheckSettingIsValid()) {
 
 
          // get param val (apply TX input to range)
-         iParamVal = bhTune_iParamRangeDelta * ((min(max(rcDataAuxInput, 1000), 2000) - 1000) * 0.001) + bhTune_iParamRangeMin;
+         iParamVal = _bhTune_iParamRangeDelta * ((min(max(rcDataAuxInput, 1000), 2000) - 1000) * 0.001) + _bhTune_iParamRangeMin;
 
          // check if it's changed
          if (iParamVal != iParamValOld) {
 
             // update state vars
-            bhTune_bSaved = 0;
+            _bhTune_bSaved = 0;
             iParamValOld = iParamVal;
 
             // pitch & roll locked
-            if ((bhTune_iKey == PITCH || bhTune_iKey == ROLL) && bhTune_bLockPitchRoll) {
+            if ((_bhTune_iKey == PITCH || _bhTune_iKey == ROLL) && _bhTune_bLockPitchRoll) {
                bhTune_setConfVal(iParamVal, PITCH);
                bhTune_setConfVal(iParamVal, ROLL);
             } else {
-               bhTune_setConfVal(iParamVal, bhTune_iKey);
+               bhTune_setConfVal(iParamVal, _bhTune_iKey);
             }
          }
       } else iParamVal=0;
@@ -90,15 +105,15 @@ BHTUNINGclass::BHTUNINGclass() {
 
       uint8_t _return;
       // multiply and limit
-      switch (bhTune_iParam) {
+      switch (_bhTune_iParam) {
       case P:
-    	  _return = min(max(0, fParamVal) * aPMult[bhTune_iKey], aPMax[bhTune_iKey]);
+    	  _return = min(max(0, fParamVal) * aPMult[_bhTune_iKey], aPMax[_bhTune_iKey]);
          break;
       case I:
-    	  _return = min(max(0, fParamVal) * aIMult[bhTune_iKey], aIMax[bhTune_iKey]);
+    	  _return = min(max(0, fParamVal) * aIMult[_bhTune_iKey], aIMax[_bhTune_iKey]);
          break;
       case D:
-    	  _return = min(max(0, fParamVal) * aDMult[bhTune_iKey], aDMax[bhTune_iKey]);
+    	  _return = min(max(0, fParamVal) * aDMult[_bhTune_iKey], aDMax[_bhTune_iKey]);
          break;
       }
       return _return;
@@ -107,15 +122,15 @@ BHTUNINGclass::BHTUNINGclass() {
    // SAVE
    void BHTUNINGclass::bhTune_save() {
 //     if (!f.ARMED && !bhTune_bSettingInvalid && !bhTune_bSaved) {
-     if (!bhTune_bSettingInvalid && !bhTune_bSaved) {
-         bhTune_bSaved = 1;
+     if (bhTune_CheckSettingIsValid() && !_bhTune_bSaved) {
+         _bhTune_bSaved = 1;
          //writeParams(0);
       }
    }
 
    // UPDATE PARAM
    void BHTUNINGclass::bhTune_setConfVal(uint8_t iParamVal, uint8_t iTuneKey) {
-      switch (bhTune_iParam) {
+      switch (_bhTune_iParam) {
       case P:
          conf.pid[iTuneKey].P8 = iParamVal;
          break;
@@ -137,9 +152,9 @@ ROLL         10    1000       1
 PITCH        10    1000       1
 YAW          10    1000       1
 PIDALT       10    1000       1
-PIDPOS      100       100       0
-PIDPOSR      10       100    1000
-PIDNAVR      10       100    1000
+PIDPOS      100     100       0
+PIDPOSR      10     100    1000
+PIDNAVR      10     100    1000
 PIDLEVEL     10    1000       1
 PIDMAG       10
 */

@@ -55,13 +55,13 @@ void loop() {
 //read and check switch pod / direction / time
   rcRawDataAuxInput = analogRead(potpin);            // reads the value of the potentiometer (value between 0 and 1023)
   AUX1Switch.check(rcRawDataAuxInput);
-  if ((AUX1Switch.switchchange) && (AUX1Switch.pidpage[PREVIOUS]!=AUX1Switch.pidpage[CURRENT]))
+  if ((AUX1Switch.switchchange) && (AUX1Switch.pidpage[AUX1Switch.PREVIOUS]!=AUX1Switch.pidpage[AUX1Switch.CURRENT]))
 //  if ((AUX1Switch.pidpage[PREVIOUS]!=AUX1Switch.pidpage[CURRENT]))
   {
-	  if (AUX1Switch.pid < X) {
+	  if (AUX1Switch.pid < AUX1Switch.X) {
 		  myLED.setOnOffTime(250,400,644,AUX1Switch.pid+1);
 	  } else {
-		  myLED.setOnOffTime(55,300,844,AUX1Switch.pidpage[PREVIOUS]);
+		  myLED.setOnOffTime(55,300,844,AUX1Switch.pidpage[AUX1Switch.PREVIOUS]);
 	  }
 
 /*
@@ -148,8 +148,8 @@ void loop() {
 //    Serial.print(swpostime[PREVIOUS], DEC); Serial.print(":");
 ////    Serial.print(swpostime[DELTA], DEC); Serial.print(":");
 ////    Serial.print(switchrapidtogglecnt, DEC); Serial.print(":");
-    Serial.print(AUX1Switch.pidpage[PREVIOUS], DEC); Serial.print(":");
-    Serial.print(AUX1Switch.pidpage[CURRENT], DEC); Serial.print(":");
+    Serial.print(AUX1Switch.pidpage[AUX1Switch.PREVIOUS], DEC); Serial.print(":");
+    Serial.print(AUX1Switch.pidpage[AUX1Switch.CURRENT], DEC); Serial.print(":");
     Serial.print(rcRawDataAuxOutput, DEC); Serial.print(":");
     Serial.println("");
   } else {

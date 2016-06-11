@@ -8,7 +8,7 @@
 #include "Arduino.h"
 #include "pidSwitch.h"
 
-void RxSwitchDiscreteValues (int16_t& xVal, rc_switch_pos& xPos)
+void PIDSWITCHclass::_RxSwitchDiscreteValues (int16_t& xVal, _rc_switch_pos& xPos)
 {
 	if ((xVal>=1200) && (xVal<=1800)) {xVal=1500; xPos=posMID;}
 	else if (xVal<1200) {xVal=1000; xPos=posLOW;}
@@ -47,7 +47,7 @@ PIDSWITCHclass::PIDSWITCHclass()
 void PIDSWITCHclass::check(int16_t potrawval)
 {
 	_swval[CURRENT] = map(potrawval,0,1023,1000,2000);
-	RxSwitchDiscreteValues(_swval[CURRENT],_swpos[CURRENT]);
+	_RxSwitchDiscreteValues(_swval[CURRENT],_swpos[CURRENT]);
 	if (_swpos[CURRENT]!=_swpos[PREVIOUS] && !switchchange)
 	{
 		 switchchange = true;
