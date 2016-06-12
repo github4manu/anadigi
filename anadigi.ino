@@ -3,6 +3,7 @@
 #include "ledFlasherClass.h"
 
 #include "config.h"
+#include "types.h"
 #include "BHTuning.h"
 
 //multiwii variables
@@ -30,7 +31,7 @@ PIDSWITCHclass AUX1Switch;
 int16_t rcRawDataAuxInput = 0;
 uint8_t rcRawDataAuxOutput = 0;
 
-BHTUNINGclass BHT;
+BHTUNINGclass BHT(PITCH,P,0);
 ledFlasherClass myLED(ledpin,322UL,111UL,644,1); //333,1000>>pidpage[PREVIOUS],500
 
 // the setup routine runs once when you press reset:
@@ -55,7 +56,7 @@ void loop() {
 //read and check switch pod / direction / time
   rcRawDataAuxInput = analogRead(potpin);            // reads the value of the potentiometer (value between 0 and 1023)
   AUX1Switch.check(rcRawDataAuxInput);
-  if ((AUX1Switch.switchchange) && (AUX1Switch.pidpage[AUX1Switch.PREVIOUS]!=AUX1Switch.pidpage[AUX1Switch.CURRENT]))
+  if ((AUX1Switch.switchchange) ) //&& (AUX1Switch.pidpage[AUX1Switch.PREVIOUS]!=AUX1Switch.pidpage[AUX1Switch.CURRENT]))
 //  if ((AUX1Switch.pidpage[PREVIOUS]!=AUX1Switch.pidpage[CURRENT]))
   {
 	  if (AUX1Switch.pid < AUX1Switch.X) {

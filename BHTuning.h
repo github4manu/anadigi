@@ -15,10 +15,11 @@
 //#include "MultiWii.h"
 //#include "EEPROM.h"
 
+enum _bhTune_params {P, I, D};
+
 class BHTUNINGclass{
 private:
 
-    enum _bhTune_params {P, I, D};
 
     // ****************************************************************
     // ***************** START OF CONFIGURABLE PARAMS *****************
@@ -31,9 +32,6 @@ private:
 
     // parameter value range - see maximums above
     float _bhTune_iValRange[2];// = {2, 4};
-
-    // RC ch. of TX potentiometer input (e.g. AUX1)
-    uint8_t _bhTune_iInputCh;// = AUX1;
 
     // lock pitch & roll values
     uint8_t _bhTune_bLockPitchRoll;// = 0;
@@ -48,15 +46,17 @@ private:
     uint8_t _bhTune_iParamRangeMin;
 
     uint8_t bhTune_CheckSettingIsValid();
-	void bhTune_setConfVal(uint8_t iParamVal, uint8_t iTuneKey);
+	void bhTune_setConfVal(uint8_t iParamVal);
+	void bhTune_setup();
+	uint8_t bhTune_clampUserVal(float fParamVal);
 
 public:
-	BHTUNINGclass();
-	void bhTune_setup();
-	uint8_t bhTune_loopSlow(int16_t rcDataAuxInput);
+	BHTUNINGclass  (uint8_t iKey, _bhTune_params iParam, uint8_t ibLockPitchRoll);
+	void setParams (uint8_t iKey, _bhTune_params iParam, uint8_t ibLockPitchRoll) ;
+
+	uint8_t bhTune_loopSlow(int16_t rcDataAuxPotInput);
 	void bhTune_save();
 
-	uint8_t bhTune_clampUserVal(float fParamVal);
 };
 
 
