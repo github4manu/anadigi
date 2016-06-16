@@ -69,20 +69,22 @@ void PIDSWITCHclass::check(int16_t potrawval)
 			 {
 				 pidpage[CURRENT] +=1;
 			 }
-			 else if ((_swdir[CURRENT] == dirUP && _swdir[PREVIOUS] == dirDOWN) || (_swdir[CURRENT] == dirDOWN && _swdir[PREVIOUS] == dirUP))
+			 else if (
+					   (_switchrapidtogglecnt==1) &&
+					   (
+					     (_swdir[CURRENT] == dirUP && _swdir[PREVIOUS] == dirDOWN) ||
+					     (_swdir[CURRENT] == dirDOWN && _swdir[PREVIOUS] == dirUP)
+					   )
+					 )
 			 {
-				 if (_switchrapidtogglecnt==1)
-				 {
-					 if ((_swpos[CURRENT] == posLOW && _swpos[PREVIOUS] == posMID))
-					 {
-						 pid = P;
-					 } else if ((_swpos[CURRENT] == posMID && _swpos[PREVIOUS] == posLOW) || (_swpos[CURRENT] == posMID && _swpos[PREVIOUS] == posHIGH))
-					 {
-						 pid = I;
-					 } else if ((_swpos[CURRENT] == posHIGH && _swpos[PREVIOUS] == posMID))
-					 {
-						 pid = D;
-					 }
+				 if ((_swpos[CURRENT] == posLOW && _swpos[PREVIOUS] == posMID))	 {
+					 pid = P;
+				 } else if ((_swpos[CURRENT] == posMID && _swpos[PREVIOUS] == posLOW) || (_swpos[CURRENT] == posMID && _swpos[PREVIOUS] == posHIGH)) {
+					 pid = I;
+				 } else if ((_swpos[CURRENT] == posHIGH && _swpos[PREVIOUS] == posMID)) {
+					 pid = D;
+				 } else {
+					 pid = X;
 				 }
 			  }
 		 }
